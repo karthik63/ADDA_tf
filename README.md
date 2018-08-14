@@ -1,2 +1,2 @@
 # ADDA_tf
-ADDA tensorflow
+Tensorflow implementation of Adversarial Discriminative Domain Adaptation(ADDA).
