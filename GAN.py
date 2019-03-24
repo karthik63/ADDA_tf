@@ -12,7 +12,7 @@ from ops import *
 from utils import *
 
 class GAN(object):
-    #初始化各类定义
+    
     def __init__(self, sess, epoch, batch_size, z_dim, dataset_name, checkpoint_dir, result_dir, log_dir, g_from_scratch):
         self.sess = sess
         self.g_from_scratch = g_from_scratch
@@ -32,7 +32,7 @@ class GAN(object):
         print("tttttttttttttttttt")
         print(np.sum(self.input_np[0][10][10]))
 
-        #mnist和fashion-mnist都是由28x28的灰色图像组成的
+        
         if dataset_name == 'mnist' or dataset_name == 'fashion-mnist':
 
             # parameters
@@ -51,11 +51,7 @@ class GAN(object):
             self.beta1 = 0.5
 
             # test
-            self.sample_num = 64  # number of generated images to be saved,保存图片的数量
-
-            # load mnist, data_X为mnist数据图片归一化结果，data_y为加上标签的数组记录
-
-            # get number of batches for a single epoch 在单个批次下处理的数据长度，此处为70000整除64=1093
+            self.sample_num = 64  
 
             print('=======================================')
             print(len(self.z_np))
@@ -63,10 +59,7 @@ class GAN(object):
         else:
             raise NotImplementedError
 
-    #送入鉴别器的输入为(64,28,28,1)
     def discriminator(self, x, is_training=True, reuse=False):
-        # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
-        # Architecture : (64)4c2s-(128)4c2s_BL-FC1024_BL-FC1_S
 
         with tf.variable_scope("discriminator", reuse=reuse):
 
@@ -84,89 +77,7 @@ class GAN(object):
 
             return out_logit, out_logit, net
 
-        # with tf.variable_scope("discriminator", reuse=reuse):
-        #     # 经过这一步卷积后，(64,28,28,1)-->(64,14,14,64)
-        #     net = lrelu(conv2d(x, 64, 4, 4, 2, 2, name='d_conv1'))
-        #     # 经过这一步卷积后，(64,14,14,64)-->(64,7,7,128)
-        #     net = lrelu(bn(conv2d(net, 128, 4, 4, 2, 2, name='d_conv2'), is_training=is_training, scope='d_bn2'))#数据标准化
-        #     #经过数组重构后，(64,7,7,128)-->(64,6272)
-        #     net = tf.reshape(net, [self.batch_size, -1])
-        #     #经过线性处理后将矩阵，(64,6272)-->(64,1024)
-        #     net = lrelu(bn(linear(net, 1024, scope='d_fc3'), is_training=is_training, scope='d_bn3'))
-        #     #经过线性处理后将矩阵，(64,1024)-->(64,1)
-        #     out_logit = linear(net, 1, scope='d_fc4')
-        #     #将数据处理在（0,1）之间
-        #     out = tf.nn.sigmoid(out_logit)
-        #
-        #     return out, out_logit, net
-
-
-    # 送入生成器的输入噪声z为(64,62)
     def generator(self, z, is_training=True, reuse=False):
-        # Network Architecture is exactly same as in infoGAN (https://arxiv.org/abs/1606.03657)
-        # Architecture : FC1024_BR-FC7x7x128_BR-(64)4dc2s_BR-(1)4dc2s_S
-
-
-
-            # net = tf.layers.conv2d(inputs=z, filters=64, kernel_size=3, padding='SAME', strides=1,
-            #                         kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-            #                         bias_initializer=tf.constant_initializer(0.0),
-            #                         name='conv1', trainable=is_training)
-            #
-            # net = tf.layers.batch_normalization(net, scale=True, trainable=is_training, name='bn1')
-            #
-            # net = tf.nn.relu(net)
-            #
-            # net = tf.layers.max_pooling2d(net, pool_size=2, strides=2, padding='VALID', name='maxpool1')
-            #
-            # net = tf.layers.conv2d(inputs=net, filters=64, kernel_size=3, padding='SAME', strides=1,
-            #                         kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-            #                         bias_initializer=tf.constant_initializer(0.0),
-            #                         name='conv2', trainable=is_training)
-            #
-            # net = tf.layers.batch_normalization(net, scale=True, trainable=is_training, name='bn2')
-            #
-            # net = tf.nn.relu(net)
-            #
-            # net = tf.layers.max_pooling2d(net, pool_size=2, strides=2, padding='VALID', name='maxpool2')
-            #
-            # net = tf.layers.conv2d(inputs=net, filters=64, kernel_size=3, padding='SAME', strides=1,
-            #                        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-            #                        bias_initializer=tf.constant_initializer(0.0),
-            #                        name='conv3', trainable=is_training)
-            #
-            # net = tf.layers.batch_normalization(net, scale=True, trainable=is_training, name='bn3')
-            #
-            # net = tf.nn.relu(net)
-            #
-            # net = tf.layers.max_pooling2d(net, pool_size=2, strides=2, padding='VALID', name='maxpool3')
-            #
-            # net = tf.layers.conv2d(inputs=net, filters=64, kernel_size=3, padding='SAME', strides=1,
-            #                        kernel_initializer=tf.truncated_normal_initializer(stddev=0.02),
-            #                        bias_initializer=tf.constant_initializer(0.0),
-            #                        name='conv4', trainable=is_training)
-            #
-            # net = tf.layers.batch_normalization(net, scale=True, trainable=is_training, name='bn4')
-            #
-            # net = tf.nn.relu(net)
-            #
-            # net = tf.layers.max_pooling2d(net, pool_size=2, strides=2, padding='VALID', name='maxpool4')
-
-        # with tf.variable_scope("encoder", reuse=reuse):
-        #     # 经过这一步卷积后，(64,28,28,1)-->(64,14,14,64)
-        #     net = lrelu(conv2d(z, 64, 4, 4, 2, 2, name='conv1'))
-        #     # 经过这一步卷积后，(64,14,14,64)-->(64,7,7,128)
-        #     net = lrelu(bn(conv2d(net, 128, 4, 4, 2, 2, name='conv2'), is_training=is_training, scope='bn2'))#数据标准化
-        #     #经过数组重构后，(64,7,7,128)-->(64,6272)
-        #     net = tf.reshape(net, [self.batch_size, -1])
-        #     #经过线性处理后将矩阵，(64,6272)-->(64,1024)
-        #     net = lrelu(bn(linear(net, 1024, scope='fc3'), is_training=is_training, scope='bn3'))
-        #     #经过线性处理后将矩阵，(64,1024)-->(64,64)
-        #     out_logit = linear(net, 500, scope='fc4')
-        #     #将数据处理在（0,1）之间
-        #     out = tf.nn.relu(out_logit)
-        #
-        #     return out
 
         is_training = True
 
@@ -212,26 +123,8 @@ class GAN(object):
 
             return out
 
-        # with tf.variable_scope("generator", reuse=reuse):
-        #     # 经过线性处理后将矩阵，(64,62)-->(64,1024)
-        #     net = tf.nn.relu(bn(linear(z, 1024, scope='g_fc1'), is_training=is_training, scope='g_bn1'))
-        #     # 经过线性处理后将矩阵，(64,1024)-->(64,6272), 6272=128*7*7
-        #     net = tf.nn.relu(bn(linear(net, 128 * 7 * 7, scope='g_fc2'), is_training=is_training, scope='g_bn2'))
-        #     # 经过重构后，形状变为(64,7,7,128)
-        #     net = tf.reshape(net, [self.batch_size, 7, 7, 128])
-        #     # 经过deconv2d,(64,7,7,128)-->(64,14,14,128)
-        #     net = tf.nn.relu(
-        #         bn(deconv2d(net, [self.batch_size, 14, 14, 64], 4, 4, 2, 2, name='g_dc3'), is_training=is_training,
-        #            scope='g_bn3'))
-        #     # 经过deconv2d,(64,14,14,128)-->(64,28,28,1),将值处理用sigmoid处理至（0,1）之间,`y = 1 / (1 + exp(-x))`
-        #     out = tf.nn.sigmoid(deconv2d(net, [self.batch_size, 28, 28, 1], 4, 4, 2, 2, name='g_dc4'))
-        #
-        #     return out
 
-    #建立GAN模型，此函数非常重要
     def build_model(self):
-        # some parameters
-        # 对于mnist数据集，图片大小为（28,28,1），此处用list列表存储
         image_dims = [self.input_to_gen_height, self.input_to_gen_width, self.c_dim]
         bs = self.batch_size
 
@@ -244,31 +137,22 @@ class GAN(object):
 
         """ Loss Function """
 
-        # output of D for real images, D_real((64,1),介于(0,1)),D_real_logits未经历过sigmoid，_临时存储net(64,1024)
+      
         D_real, D_real_logits, _ = self.discriminator(self.z, is_training=True, reuse=False)
 
-        # output of D for fake images G为由噪声z（64,62）生成的图片数据(64,28,28,1)
         self.G = self.generator(self.inputs, is_training=True, reuse=False)
 
-        #D_fake((64,1),介于(0,1)),D_fake_logits未经历过sigmoid，_临时存储net(64,1024),送入鉴别器的是G生成的假的数据
         D_fake, D_fake_logits, _ = self.discriminator(self.G, is_training=True, reuse=True)
-
-        # get loss for discriminator
-        #它对于输入的logits先通过sigmoid函数计算，再计算它们的交叉熵，但是它对交叉熵的计算方式进行了优化，使得结果不至于溢出
-        #tf.ones_like的使用默认交叉商前面的系数为1数组
-        #d_loss_real=-log(sigmoid(D_real_logits))等价于d_loss_real=-log(D(x))
 
         real_labels = np.concatenate((np.ones([self.batch_size,1], dtype=np.float32), np.zeros([self.batch_size,1], dtype=np.float32)), axis=1)
 
         d_loss_real = tf.reduce_mean(
             tf.nn.softmax_cross_entropy_with_logits(logits=D_real_logits, labels=real_labels))
-        # d_loss_fake=-log(sigmoid(D_fake_logits))等价于d_loss_fake=-log(D(G(z))
 
         fake_labels = np.concatenate((np.zeros([self.batch_size,1], dtype=np.float32), np.ones([self.batch_size, 1], dtype=np.float32)), axis=1)
 
         d_loss_fake = tf.reduce_mean(
             tf.nn.softmax_cross_entropy_with_logits(logits=D_fake_logits, labels=fake_labels))
-        #d_loss为生成器和鉴别器传出的loss之和
         self.d_loss = d_loss_real + d_loss_fake
 
         # get loss for generator
